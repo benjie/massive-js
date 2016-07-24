@@ -3,6 +3,8 @@ CREATE EXTENSION IF NOT EXISTS pgcrypto;
 drop materialized view if exists mv_orders;
 drop table if exists "Users";
 drop table if exists products cascade;
+drop table if exists products_with_rls cascade;
+drop role if exists users;
 drop table if exists uuid_docs;
 drop table if exists docs;
 drop table if exists orders;
@@ -24,6 +26,23 @@ create table products(
   created_at timestamptz default now() not null,
   tags character varying(255)[]
 );
+
+create table products_with_rls(
+  id serial primary key,
+  name varchar(50) NOT NULL,
+  price decimal(10,2) default 0.00 not null,
+  description text,
+  in_stock boolean,
+  specs jsonb,
+  created_at timestamptz default now() not null,
+  tags character varying(255)[]
+);
+
+alter table products_with_rls enable row level security;
+
+create role users;
+create policy products_allow_user_1 on products_with_rls to users using (current_setting('claims.user_id')::integer = 1);
+
 
 create table docs(
   id serial primary key,
