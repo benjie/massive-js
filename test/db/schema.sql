@@ -104,7 +104,7 @@ drop table if exists myschema.docs;
 
 -- just in case:
 drop table if exists myschema.doggies;
-drop schema if exists myschema;
+drop schema if exists myschema cascade;
 
 create schema myschema;
 
